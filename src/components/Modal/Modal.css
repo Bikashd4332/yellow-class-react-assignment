@@ -1,0 +1,40 @@
+.ModalBackdrop {
+    position: fixed;
+    top: 0;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.7)
+}
+
+.Modal {
+    z-index: 500;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    box-shadow: 1px 1px 5px #fff;
+    padding: 20px;
+    box-sizing: border-box;
+    height: 100vh;
+    transition: all 0.3s ease-out;
+}
+
+#unpsplash-img {
+    height: 100%;
+}
+
+.leftArrow {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    right: 15px;
+    top: -50%;
+}
+
+.rightArrow {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: -50%;
+}
