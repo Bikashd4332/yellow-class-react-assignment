@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useMemo }  from 'react';
+import React, { useState, MouseEventHandler, useMemo, ReactElement, RefCallback }  from 'react';
 import  { Masonry } from 'react-virtualized/dist/commonjs/Masonry';
 import  { WindowScroller } from 'react-virtualized/dist/commonjs/WindowScroller';
 import  { AutoSizer } from 'react-virtualized/dist/commonjs/AutoSizer';
@@ -15,11 +15,16 @@ export type UnsplashMasonryProps = {
 }
 
 export default function UnsplashMasonry(props: UnsplashMasonryProps){
+
+    const [scrollElement, setScrollElement] = useState<HTMLDivElement | null>(null);
+
     const cellMeasurerCache = useMemo(() => ( new CellMeasurerCache({
         defaultHeight: 200,
         defaultWidth: 200,
         fixedWidth: true,
     })), []);
+
+    const setRefForScrollElement: RefCallback<HTMLDivElement> = (ref) => { setScrollElement(ref); }
 
     const autoResizer = ({ height, scrollTop }: WindowScrollerChildProps) => {
         return (
@@ -78,15 +83,15 @@ export default function UnsplashMasonry(props: UnsplashMasonryProps){
         )
     };
 
-    return <>
+    return <div ref={setRefForScrollElement}>
         {
             (props.list && props.list.length) ? (
-                    <WindowScroller overScanByPixle={props.overscanByPixels} style={{ margin: 'auto', }}>
+                    <WindowScroller overScanByPixle={props.overscanByPixels} scrollElement={scrollElement!}>
                         { autoResizer }
                     </WindowScroller>
             ) : (
                     <p style={{ color: '#fff' }}> Loading... </p>
             )
         }
-    </>
+    </div>
 }
