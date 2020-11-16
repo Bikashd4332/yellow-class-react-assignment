@@ -8,7 +8,7 @@ import { UnsplashResponse } from '../../services/fetchImages';
 
 export type UnsplashMasonryProps = {
     clickHandler: MouseEventHandler<HTMLDivElement>,
-    list: UnsplashResponse[],
+    list: Array<{ size: { width: number, height: number } } & { item: UnsplashResponse }>,
     columnWidth: number,
     gutterSize: number,
     overscanByPixels: number,
@@ -56,7 +56,10 @@ export default function UnsplashMasonry(props: UnsplashMasonryProps){
     };
 
     const cellRenderer = ({ index, key, parent, style }: MasonryCellProps ) => {
-        const datum = props.list[index];
+        console.log(props.list, index);
+        const {size, item} = props.list[index];
+        const height = props.columnWidth * (size.height / size.width) || 200;
+
         return (
             <CellMeasurer cache={cellMeasurerCache}  index={index} key={key} parent={parent}>
                 <div style={{ ...style,
@@ -67,7 +70,15 @@ export default function UnsplashMasonry(props: UnsplashMasonryProps){
                     onClick={props.clickHandler}
                     data-index={index}
                 >
-                    <img alt="unsplash" src={datum?.urls?.thumb} data-index={index} />
+                    <img alt="unsplash"
+                         src={item?.urls?.thumb}
+                         data-index={index}
+                         style={{
+                            height: height,
+                            width: props.columnWidth,
+                             display: "block"
+                         }}
+                    />
                     <p style={{
                         padding: 0,
                         margin: 0,
@@ -76,22 +87,18 @@ export default function UnsplashMasonry(props: UnsplashMasonryProps){
                     }}
                        data-index={index}
                     >
-                        { datum?.description ?? datum?.alt_description}
+                        { item?.description ?? item?.alt_description}
                     </p>
                 </div>
             </CellMeasurer>
         )
     };
 
-    return <div ref={setRefForScrollElement}>
-        {
-            (props.list && props.list.length) ? (
-                    <WindowScroller overScanByPixle={props.overscanByPixels} scrollElement={scrollElement!}>
-                        { autoResizer }
-                    </WindowScroller>
-            ) : (
-                    <p style={{ color: '#fff' }}> Loading... </p>
-            )
-        }
-    </div>
+    return (
+        <div ref={setRefForScrollElement}>
+            <WindowScroller overScanByPixle={props.overscanByPixels} scrollElement={scrollElement!}>
+                { autoResizer }
+            </WindowScroller>
+        </div>
+    );
 }
