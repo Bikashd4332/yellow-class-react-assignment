@@ -15,6 +15,7 @@ import {
   CellMeasurerCache,
 } from "react-virtualized/dist/commonjs/CellMeasurer";
 import { UnsplashResponse } from "../../services/fetchImages";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export type UnsplashMasonryProps = {
   clickHandler: MouseEventHandler<HTMLDivElement>;
@@ -23,7 +24,10 @@ export type UnsplashMasonryProps = {
   >;
   columnWidth: number;
   gutterSize: number;
+  isPageLoading: boolean;
+  fetchNextPage: () => Promise<void>;
   overScanByPixel: number;
+  perPage: number;
 };
 
 class UnsplashMasonry extends React.Component<UnsplashMasonryProps> {
@@ -67,13 +71,20 @@ class UnsplashMasonry extends React.Component<UnsplashMasonryProps> {
 
   render() {
     return (
-      <WindowScroller
-        overScanByPixle={this.props.overScanByPixel}
-        onResize={this._onResize}
-        rowCount={this.props.list?.length}
+      <InfiniteScroll
+        dataLength={this.props.list.length}
+        next={this.props.fetchNextPage}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
       >
-        {this._autoSizer}
-      </WindowScroller>
+        <WindowScroller
+          overScanByPixle={this.props.overScanByPixel}
+          onResize={this._onResize}
+          rowCount={this.props.list?.length}
+        >
+          {this._autoSizer}
+        </WindowScroller>
+      </InfiniteScroll>
     );
   }
 

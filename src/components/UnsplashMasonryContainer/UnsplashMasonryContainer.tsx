@@ -5,22 +5,46 @@ import React, {
   useState,
 } from "react";
 import UnsplashMasonry from "../UnsplashMasonry/UnsplashMasonryCC";
-import fetchImages, { UnsplashResponse } from "../../services/fetchImages";
+import fetchImages, {
+  UnsplashOrderBy,
+  UnsplashResponse,
+} from "../../services/fetchImages";
 import Modal from "../Modal/Modal";
 // @ts-ignore
 import ImageMeasurer from "react-virtualized-image-measurer";
 
 export default function UnsplashMasonryContainer() {
+  const [page, setPage] = useState<number>(1);
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(false);
   const [list, setList] = useState<UnsplashResponse[]>([]);
   const [detailViewImageIndex, setDetailViewImageIndex] = useState<
     number | null
   >(null);
 
   useEffect(() => {
-    fetchImages(30, 1).then((response) =>
-      setList((prevData) => [...prevData, ...response])
-    );
+    setIsPageLoading(true);
+    fetchImages(30, 1, UnsplashOrderBy.OLDEST).then((response) => {
+      setList((prevData) => [...prevData, ...response]);
+      setIsPageLoading(false);
+    });
   }, []);
+
+  const closeModal = useCallback(() => {
+    setDetailViewImageIndex(null);
+  }, []);
+
+  const appendFetchedData = useCallback((fetchedData) => {
+    setList((prevList) => [...prevList, ...fetchedData]);
+  }, []);
+
+  const fetchNextPage = useCallback(() => {
+    return fetchImages(30, page + 1, UnsplashOrderBy.OLDEST).then(
+      (response) => {
+        appendFetchedData(response);
+        setPage((prevPage) => prevPage + 1);
+      }
+    );
+  }, [page, appendFetchedData]);
 
   const clickHandler: MouseEventHandler<HTMLDivElement> = useCallback(
     (event) => {
@@ -93,9 +117,12 @@ export default function UnsplashMasonryContainer() {
               {...{
                 list: itemsWithSizes,
                 columnWidth: 200,
+                perPage: 30,
                 gutterSize: 25,
                 overScanByPixel: 3,
                 clickHandler,
+                isPageLoading,
+                fetchNextPage,
               }}
             />
           )}
@@ -106,6 +133,7 @@ export default function UnsplashMasonryContainer() {
       {detailViewImageIndex !== null && (
         <Modal
           urls={list[detailViewImageIndex]?.urls}
+          closeModal={closeModal}
           canGoPrevious={detailViewImageIndex > 0}
           canGoNext={detailViewImageIndex < list.length - 1}
           nextHandle={nextHandle}

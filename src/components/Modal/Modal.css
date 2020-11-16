@@ -38,3 +38,10 @@
     left: 15px;
     top: -50%;
 }
+
+.backArrow {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    top: -90%;
+}
