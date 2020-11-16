@@ -35,7 +35,7 @@ export default function fetchImages(
         params: { per_page: perPage,
                   page,
                   order_by: orderBy,
-                  client_id:  '8o1jddyyiz209iEVbqSVrfzZD0jtcmcWye2-1egIDMM'
+                  client_id:  `${process.env.REACT_APP_UNSPLASH_API_ACCESS_KEY}`
          }
     };
     return axios.get<UnsplashResponse[]>(`${UNSPLASH_API_KEY}/photos`, axiosConfig)
